@@ -128,18 +128,17 @@ def plot_residual_risk_heatmap_altair(df):
     return (chart + text).interactive()
 
 def run_page3():
-    st.header("Visualizations")
+    st.header("Risk Visualization")
 
     if 'synthetic_df' not in st.session_state:
-        st.warning("Please generate and validate data on the 'Data Generation and Validation' page first.")
+        st.warning("Please generate data on the 'Data Generation and Validation' page first.")
         return
 
-    synthetic_df = st.session_state['synthetic_df']
-    
-    synthetic_df_calculated = synthetic_df.copy()
-    if 'Residual_Risk_Rating' not in synthetic_df_calculated.columns:
+    if 'synthetic_df_calculated' not in st.session_state:
         st.warning("Please calculate Residual Risk first on the 'Residual Risk Calculation' page.")
         return
+
+    synthetic_df_calculated = st.session_state['synthetic_df_calculated']
     
     has_time_series = st.session_state.get('has_time_series', False) # Use get to provide a default value
 

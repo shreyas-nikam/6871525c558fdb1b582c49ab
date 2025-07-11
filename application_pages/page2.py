@@ -84,5 +84,8 @@ def run_page2():
         synthetic_df_calculated = calculate_residual_risk(synthetic_df, calculation_method)
         st.subheader(f"Data with Residual Risk ({calculation_method} Method)")
         st.dataframe(synthetic_df_calculated.head())
+        
+        # Store the calculated data in session state for page3
+        st.session_state['synthetic_df_calculated'] = synthetic_df_calculated
     except ValueError as e:
         st.error(f"Error calculating residual risk: {e}")

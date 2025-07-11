@@ -9,14 +9,14 @@ def generate_synthetic_data(num_units, has_time_series):
         raise TypeError("has_time_series must be a boolean")
 
     risk_unit_types = ['Business Unit', 'Department', 'Team']
-    risk_ratings = ['Low', 'Medium', 'High', 'Very High']
+    risk_ratings = ['Low', 'Medium', 'High']
     control_types = ['Preventative', 'Detective', 'Corrective']
 
     data = {
         'Risk_Assessment_Unit_ID': range(1, num_units + 1),
         'Risk_Assessment_Unit_Type': np.random.choice(risk_unit_types, num_units),
         'Inherent_Risk_Rating': np.random.choice(risk_ratings, num_units),
-        'Control_Effectiveness_Rating': np.random.choice(risk_ratings, num_units),
+        'Control_Effectiveness_Rating': np.random.choice(['Low', 'Medium', 'High'], num_units),
         'Control_Type': np.random.choice(control_types, num_units),
         'Control_Key_Status': np.random.choice([True, False], num_units),
         'Process_Complexity': np.random.randint(1, 11, num_units),
@@ -79,8 +79,8 @@ def run_page1():
         buffer = StringIO()
         synthetic_df.info(buf=buffer)
         s = buffer.getvalue()
-        st.text("DataFrame Info:")
-        st.text(s)
+        # st.text("DataFrame Info:")
+        # st.text(s)
 
         try:
             validate_data(synthetic_df.copy())
