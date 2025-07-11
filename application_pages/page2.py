@@ -71,17 +71,12 @@ def calculate_residual_risk(df, calculation_method):
 
 def run_page2():
     st.header("Residual Risk Calculation")
-    # Sample DataFrame (replace with your actual DataFrame)
-    data = {'Risk_Assessment_Unit_ID': [1, 2, 3, 4, 5],
-            'Risk_Assessment_Unit_Type': ['Business Unit', 'Department', 'Team', 'Business Unit', 'Department'],
-            'Inherent_Risk_Rating': ['Low', 'Medium', 'High', 'Very High', 'Medium'],
-            'Control_Effectiveness_Rating': ['High', 'Medium', 'Low', 'High', 'Medium'],
-            'Control_Type': ['Preventative', 'Detective', 'Corrective', 'Preventative', 'Detective'],
-            'Control_Key_Status': [True, False, True, False, True],
-            'Process_Complexity': [3, 5, 7, 2, 6],
-            'Operational_Metric_1': [45.6, 58.2, 71.9, 32.4, 63.7],
-            'Operational_Metric_2': [92.1, 115.8, 142.3, 64.8, 127.4]}
-    synthetic_df = pd.DataFrame(data)
+
+    if 'synthetic_df' not in st.session_state:
+        st.warning("Please generate data on the 'Data Generation and Validation' page first.")
+        return
+
+    synthetic_df = st.session_state['synthetic_df']
 
     calculation_method = st.radio("Select Residual Risk Calculation Method", ('Basic', 'Weighted'))
 
