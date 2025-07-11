@@ -73,15 +73,31 @@ def run_page1():
         synthetic_df = generate_synthetic_data(num_units, has_time_series)
         st.subheader("Generated Synthetic Data")
         st.dataframe(synthetic_df.head())
+        
+        # Capture info output
+        from io import StringIO
+        buffer = StringIO()
+        synthetic_df.info(buf=buffer)
+        s = buffer.getvalue()
         st.text("DataFrame Info:")
-        st.text(str(synthetic_df.info()))
+        st.text(s)
 
         try:
             validate_data(synthetic_df.copy())
             st.success("Data validation successful!")
+            st.session_state['synthetic_df'] = synthetic_df.copy() # Store in session state
+            st.session_state['has_time_series'] = has_time_series # Store this as well for page3
         except (KeyError, ValueError, TypeError) as e:
             st.error(f"Data validation failed: {e}")
+            if 'synthetic_df' in st.session_state:
+                del st.session_state['synthetic_df'] # Clear invalid data
+            if 'has_time_series' in st.session_state:
+                del st.session_state['has_time_series']
 
     except TypeError as e:
         st.error(f"Error generating data: {e}")
+        if 'synthetic_df' in st.session_state:
+            del st.session_state['synthetic_df']
+        if 'has_time_series' in st.session_state:
+            del st.session_state['has_time_series']
 
