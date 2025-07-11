@@ -68,6 +68,13 @@ def run_page1():
     st.header("Data Generation and Validation")
     st.markdown("""
     Here, you can generate synthetic operational risk data and validate its integrity. Adjust the parameters to create different datasets and ensure data quality.
+
+    The synthetic data generation process is summarized by:
+    $$\text{Synthetic Data} = \{ \text{randomly sampled attributes for each unit} \}$$
+    where each attribute is independently generated based on predefined distributions or lists of possible values.
+
+    The validation process can be summarized as follows:
+    $$\text{Data Validation} = \{ \text{Column Presence} \} \cap \{ \text{Data Type Correctness} \} \cap \{ \text{PK Uniqueness} \} \cap \{ \text{No Missing Values} \}$$
     """)
 
     num_units = st.sidebar.slider("Number of Risk Units", min_value=10, max_value=100, value=50, help="Adjust the number of hypothetical risk assessment units to simulate.")
@@ -82,8 +89,14 @@ def run_page1():
     try:
         validate_data(synthetic_df)
         st.success("Data validation successful!")
+        # Store the generated and validated dataframe in session state for other pages
+        st.session_state['synthetic_df'] = synthetic_df
     except Exception as e:
         st.error(f"Data validation failed: {e}")
+        # Clear the session state if validation fails, to prevent using invalid data
+        if 'synthetic_df' in st.session_state:
+            del st.session_state['synthetic_df']
+
 
 if __name__ == "__main__":
     run_page1()
