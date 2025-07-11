@@ -59,6 +59,9 @@ def run_page2():
     st.header("Risk Calculation")
     st.markdown("""
     Calculate the residual risk based on the inherent risk and control effectiveness. Choose the calculation method to see the impact on the residual risk scores and ratings.
+    The basic formula for residual risk calculation is:
+    $$\text{Residual Risk} = f(\text{Inherent Risk}, \text{Control Effectiveness})$$
+    where $f$ can be either an additive function (Basic method) or a multiplicative/weighted function (Weighted method). The choice of method should reflect the organization's specific approach to risk assessment and the relative importance of controls in mitigating inherent risks.
     """)
 
     calculation_method = st.sidebar.radio("Calculation Method", options=['Basic', 'Weighted'], help="Choose the formula for calculating Residual Risk: 'Basic' (Inherent - Control) or 'Weighted' (Inherent / Control).")
@@ -78,6 +81,8 @@ def run_page2():
         residual_risk_df = calculate_residual_risk(synthetic_df, calculation_method)
         st.subheader("Residual Risk Results")
         st.dataframe(residual_risk_df)
+        # Store the updated dataframe with residual risk in session state for other pages
+        st.session_state['synthetic_df'] = residual_risk_df
     except Exception as e:
         st.error(f"Risk calculation failed: {e}")
 
