@@ -3,815 +3,902 @@ summary: Second Lab of Module 3 Documentation
 feedback link: https://docs.google.com/forms/d/e/1FAIpQLSfWkOK-in_bMMoHSZfcIvAeO58PAH9wrDqcxnJABHaxiDqhSA/viewform?usp=sf_link
 environments: Web
 status: Published
-# Operational Risk Management Simulation with Streamlit
+# Operational Risk Assessment with Streamlit: A QuLab Guide
 
-## 1. Introduction to Operational Risk Management Simulation
-Duration: 0:08:00
+## Step 1: Introduction to Operational Risk and the QuLab Application
+Duration: 00:05:00
 
-In this codelab, you will dive into the fascinating world of operational risk management through a hands-on, interactive simulation built using Streamlit. This application, named **QuLab**, serves as an educational tool for developers and risk practitioners to explore how various factors influence an organization's risk profile.
+Welcome to the QuLab Operational Risk Assessment Codelab! In this guide, you will learn how to set up, understand, and extend a Streamlit application designed for hands-on exploration of operational risk assessment using synthetic data.
+
+Operational risk is defined as the risk of loss resulting from inadequate or failed internal processes, people and systems, or from external events. Managing operational risk is crucial for any organization, especially in finance, as it directly impacts financial stability, regulatory compliance, and overall organizational resilience. This application provides a practical environment to simulate and analyze operational risk scenarios.
 
 <aside class="positive">
-<b>Why is this important?</b> Operational risk is a critical component of enterprise risk management (ERM). It encompasses risks arising from failures in internal processes, people, and systems, or from external events. Understanding how these risks are identified, assessed, and mitigated is crucial for business resilience and strategic decision-making.
+  Understanding operational risk is not just about compliance; it's about <b>proactive risk management</b> to safeguard an organization's assets and reputation.
 </aside>
 
-### Key Concepts Explored:
+The QuLab application focuses on three core concepts:
 
-*   **Inherent Risk:** This is the level of risk existing before any controls or mitigation strategies are applied. Think of it as the raw risk associated with an activity or process.
-*   **Control Effectiveness:** This measures how well existing controls mitigate the inherent risk. Controls can be preventative (stopping an event before it occurs), detective (identifying an event after it occurs), or corrective (fixing an issue after it occurs).
-*   **Residual Risk:** This is the risk that remains after all controls have been implemented and are operating effectively. It's the "leftover" risk that an organization must accept, transfer, or further mitigate.
+1.  **Synthetic Data Generation**: Creating realistic, yet artificial, datasets for risk analysis without relying on sensitive real-world data. This allows for safe experimentation and development.
+    $$\text{Synthetic Data} = \{ \text{randomly sampled attributes for each unit} \}$$
 
-### The QuLab Application:
-QuLab allows you to interactively:
-1.  **Generate and Validate Synthetic Operational Risk Data:** Create datasets with varying numbers of risk units and optional time-series components.
-2.  **Calculate Residual Risk:** Experiment with different methods (Basic, Weighted) to understand how inherent risk and control effectiveness combine to determine the final residual risk.
-3.  **Visualize Risk Relationships and Trends:** Explore interactive plots showing relationships between risk factors and trends over time.
+2.  **Data Validation**: Ensuring the quality and integrity of the generated data. This is a critical step in any data-driven process to prevent errors and ensure reliable analysis.
+    $$\text{Data Validation} = \{ \text{Column Presence} \} \cap \{ \text{Data Type Correctness} \} \cap \{ \text{PK Uniqueness} \} \cap \{ \text{No Missing Values} \}$$
 
-### Fundamental Formulae for Residual Risk:
-The core idea behind residual risk calculation is that it's a function of inherent risk and control effectiveness. In this simulation, we explore two simplified methods:
+3.  **Residual Risk Calculation**: Determining the risk that remains after controls have been put in place. This is a key metric in operational risk management.
+    $$\text{Residual Risk} = f(\text{Inherent Risk}, \text{Control Effectiveness})$$
+    Here, $f$ represents a function that combines inherent risk (the raw risk before controls) and control effectiveness (how well the controls mitigate the risk).
 
-$$ \text{Residual Risk} = f(\text{Inherent Risk}, \text{Control Effectiveness}) $$
+### Application Architecture Overview
 
-For the **'Basic'** method, it's an additive relationship (or rather, subtractive, representing mitigation):
-$$ \text{Residual Risk Score} = \text{Inherent Risk Score} - \text{Control Effectiveness Score} $$
+The QuLab application is built with Streamlit and is modularized into several Python files for better organization and maintainability.
 
-For the **'Weighted'** (or multiplicative/ratio-based) method:
-$$ \text{Residual Risk Score} = \frac{\text{Inherent Risk Score}}{\text{Control Effectiveness Score}} $$
+-   **`app.py`**: The main entry point of the Streamlit application. It handles the overall layout, displays introductory information, and manages navigation between different functional pages using Streamlit's sidebar.
+-   **`application_pages/page1.py`**: Dedicated to data generation and initial validation. This module allows users to configure and create synthetic operational risk data.
+-   **`application_pages/page2.py`**: Focuses on calculating residual risk based on the generated data. It implements different methodologies for risk computation.
+-   **`application_pages/page3.py`**: Provides various visualizations to help users understand the relationships and trends within the risk data.
 
-Where:
-*   `Inherent Risk Score` is a numerical representation (e.g., 1-4 for Low to Very High).
-*   `Control Effectiveness Score` is a numerical representation (e.g., 1-3 for Low to High).
+Data flow between these pages is managed using Streamlit's `st.session_state`, which allows a DataFrame generated on one page to be accessed and modified on subsequent pages.
 
-<aside class="negative">
-<b>Important Disclaimer:</b> The data generated by this application is synthetic and purely for illustrative and educational purposes. It should NOT be used for real-world risk management decisions. The calculation methods are simplified and may not reflect complex risk models used in practice.
-</aside>
-
-### Application Architecture and Flow:
-
-The QuLab application follows a modular architecture using Streamlit's multi-page application pattern, albeit implemented using `st.sidebar.selectbox` and conditional page loading.
+**Flowchart Representation:**
 
 ```mermaid
 graph TD
-    A[app.py - Main Application] --> B{Sidebar Navigation};
-    B -- "Data Generation and Validation" --> C[application_pages/page1.py];
-    B -- "Residual Risk Calculation" --> D[application_pages/page2.py];
-    B -- "Visualizations" --> E[application_pages/page3.py];
-    C -- "Generated Data (st.session_state)" --> D;
-    D -- "Calculated Data (st.session_state)" --> E;
+    A[Start Application: app.py] --> B{Navigation Selection};
+    B -- "Data Generation and Validation" --> C[Page 1: generate_synthetic_data & validate_data];
+    C -- "Store DF in session_state" --> D[session_state];
+    B -- "Risk Calculation" --> E[Page 2: calculate_residual_risk];
+    E -- "Read DF from session_state" --> D;
+    D -- "Update DF in session_state" --> E;
+    B -- "Visualizations" --> F[Page 3: plot_visualizations];
+    F -- "Read DF from session_state" --> D;
+```
+*(Note: The mermaid diagram above is a conceptual representation. Markdown codelab format does not natively render mermaid, but it illustrates the logical flow.)*
+
+Now, let's get started by setting up your environment and running the application.
+
+## Step 2: Setting Up the Environment and Running the Application
+Duration: 00:05:00
+
+Before running the QuLab application, you need to ensure you have Python installed and the necessary libraries are in your environment.
+
+### Prerequisites
+
+You will need:
+-   Python 3.8+
+-   `streamlit`
+-   `pandas`
+-   `numpy`
+-   `matplotlib`
+-   `seaborn`
+
+### Project Structure
+
+Create a directory structure like this:
+
+```
+quLab_app/
+├── app.py
+└── application_pages/
+    ├── __init__.py
+    ├── page1.py
+    ├── page2.py
+    └── page3.py
 ```
 
-*   `app.py`: The entry point. Sets up the page configuration, displays the main title and introduction, and handles navigation via the sidebar. It dynamically imports and runs the functions for each page based on user selection.
-*   `application_pages/page1.py`: Handles the generation of synthetic operational risk data and performs basic data validation. It stores the generated DataFrame in Streamlit's `session_state` for use by other pages.
-*   `application_pages/page2.py`: Focuses on calculating residual risk. It retrieves the data from `session_state`, applies selected calculation methods (Basic or Weighted), and displays the results.
-*   `application_pages/page3.py`: Provides various interactive visualizations using Altair to analyze the generated and calculated risk data, also retrieving data from `session_state`.
+### Installation
 
-## 2. Setting Up the Development Environment
-Duration: 0:05:00
-
-To get started with QuLab, you'll need to set up your Python environment and install the necessary libraries.
-
-### Prerequisites:
-*   Python 3.8+ installed on your system.
-*   `pip` (Python package installer) for installing dependencies.
-
-### Installation Steps:
-
-1.  **Create a Project Directory:**
-    First, create a new directory for your project and navigate into it.
-
+1.  **Create a virtual environment (recommended):**
     ```bash
-    mkdir qulab_app
-    cd qulab_app
+    python -m venv venv
     ```
 
-2.  **Create `application_pages` Subdirectory:**
-    The application uses a modular structure, so create the `application_pages` directory.
+2.  **Activate the virtual environment:**
+    -   On Windows:
+        ```bash
+        .\venv\Scripts\activate
+        ```
+    -   On macOS/Linux:
+        ```bash
+        source venv/bin/activate
+        ```
 
+3.  **Install the required libraries:**
     ```bash
-    mkdir application_pages
+    pip install streamlit pandas numpy matplotlib seaborn
     ```
 
-3.  **Save the Application Files:**
-    Copy the provided code into the respective files within your `qulab_app` directory.
+### Copying the Code
 
-    *   **`app.py`**
-        ```python
-        import streamlit as st
-        st.set_page_config(page_title="QuLab", layout="wide")
-        st.sidebar.image("https://www.quantuniversity.com/assets/img/logo5.jpg")
-        st.sidebar.divider()
-        st.title("QuLab")
-        st.divider()
-        st.markdown("""
-        In this lab, you can explore the concepts of operational risk management through simulation. By adjusting parameters like the number of risk assessment units and the calculation method for residual risk, you can observe how inherent risk, control effectiveness, and other factors influence the overall risk profile.
+Place the provided code into the respective files:
 
-        ### Key Concepts:
-
-        *   **Inherent Risk:** The level of risk before considering the impact of controls.
-        *   **Control Effectiveness:** The degree to which controls mitigate inherent risk.
-        *   **Residual Risk:** The level of risk remaining after considering the impact of controls.
-
-        ### Instructions:
-
-        Use the sidebar to navigate to different pages of the application. Each page provides a different perspective on operational risk assessment. Experiment with the input parameters to see how they affect the results.
-
-        For example, on the "Data Generation and Validation" page, you can adjust the number of risk assessment units and whether to include time series data. On the "Residual Risk Calculation" page, you can select different calculation methods to see how they impact the residual risk rating. On the "Visualizations" page, you can explore the relationships between different risk factors through interactive plots.
-
-        **Important Considerations:**
-
-        *   The synthetic data generated by this application is for illustrative purposes only and should not be used for actual risk management decisions.
-        *   The residual risk calculation methods used in this application are simplified examples and may not be appropriate for all situations.
-
-        **Formulae:**
-
-        The basic formula for residual risk calculation is:
-
-        $$\text{Residual Risk} = f(\text{Inherent Risk}, \text{Control Effectiveness})$$
-
-        where $f$ can be either an additive function ('Basic' method) or a multiplicative/weighted function ('Weighted' method).
-
-        """)
-        # Your code starts here
-        page = st.sidebar.selectbox(label="Navigation", options=["Data Generation and Validation", "Residual Risk Calculation", "Visualizations"])
-        if page == "Data Generation and Validation":
-            from application_pages.page1 import run_page1
-            run_page1()
-        elif page == "Residual Risk Calculation":
-            from application_pages.page2 import run_page2
-            run_page2()
-        elif page == "Visualizations":
-            from application_pages.page3 import run_page3
-            run_page3()
-        # Your code ends
-        ```
-
-    *   **`application_pages/page1.py`**
-        ```python
-        import streamlit as st
-        import pandas as pd
-        import numpy as np
-        from io import StringIO # Import StringIO for capturing info output
-
-        def generate_synthetic_data(num_units, has_time_series):
-            """Generates a pandas.DataFrame with synthetic operational risk data."""
-            if not isinstance(has_time_series, bool):
-                raise TypeError("has_time_series must be a boolean")
-
-            risk_unit_types = ['Business Unit', 'Department', 'Team']
-            risk_ratings = ['Low', 'Medium', 'High', 'Very High']
-            control_types = ['Preventative', 'Detective', 'Corrective']
-
-            data = {
-                'Risk_Assessment_Unit_ID': range(1, num_units + 1),
-                'Risk_Assessment_Unit_Type': np.random.choice(risk_unit_types, num_units),
-                'Inherent_Risk_Rating': np.random.choice(risk_ratings, num_units),
-                'Control_Effectiveness_Rating': np.random.choice(risk_ratings, num_units),
-                'Control_Type': np.random.choice(control_types, num_units),
-                'Control_Key_Status': np.random.choice([True, False], num_units),
-                'Process_Complexity': np.random.randint(1, 11, num_units),
-                'Operational_Metric_1': np.random.normal(50, 10, num_units),
-                'Operational_Metric_2': np.random.normal(100, 20, num_units)
-            }
-            df = pd.DataFrame(data)
-
-            if has_time_series:
-                df['Assessment_Cycle'] = np.random.randint(2020, 2024, num_units)
-            return df
-
-        def validate_data(df):
-            """Validates DataFrame for expected columns, data types, PK uniqueness, and missing values."""
-            expected_columns = ['Risk_Assessment_Unit_ID', 'Risk_Assessment_Unit_Type', 'Inherent_Risk_Rating',
-                                'Control_Effectiveness_Rating', 'Control_Type', 'Control_Key_Status',
-                                'Process_Complexity', 'Operational_Metric_1', 'Operational_Metric_2']
-
-            for col in expected_columns:
-                if col not in df.columns:
-                    raise KeyError(f"Missing column: {col}")
-
-            if df['Risk_Assessment_Unit_ID'].duplicated().any():
-                raise ValueError("Duplicate Risk_Assessment_Unit_ID values found.")
-
-            if df.isnull().any().any():
-                raise ValueError("Missing values found in DataFrame.")
-
-            if not pd.api.types.is_numeric_dtype(df['Risk_Assessment_Unit_ID']):
-                raise TypeError("Risk_Assessment_Unit_ID should be numeric.")
-            if not pd.api.types.is_string_dtype(df['Risk_Assessment_Unit_Type']):
-                raise TypeError("Risk_Assessment_Unit_Type should be string.")
-            if not pd.api.types.is_string_dtype(df['Inherent_Risk_Rating']):
-                raise TypeError("Inherent_Risk_Rating should be string.")
-            if not pd.api.types.is_string_dtype(df['Control_Effectiveness_Rating']):
-                raise TypeError("Control_Effectiveness_Rating should be string.")
-            if not pd.api.types.is_string_dtype(df['Control_Type']):
-                raise TypeError("Control_Type should be string.")
-            if not pd.api.types.is_bool_dtype(df['Control_Key_Status']):
-                raise TypeError("Control_Key_Status should be boolean.")
-            if not pd.api.types.is_numeric_dtype(df['Process_Complexity']):
-                raise TypeError("Process_Complexity should be numeric.")
-            if not pd.api.types.is_numeric_dtype(df['Operational_Metric_1']):
-                raise TypeError("Operational_Metric_1 should be numeric.")
-            if not pd.api.types.is_numeric_dtype(df['Operational_Metric_2']):
-                raise TypeError("Operational_Metric_2 should be numeric.")
-
-        def run_page1():
-            st.header("Data Generation and Validation")
-            num_units = st.slider("Number of Risk Units", 10, 500, 100)
-            has_time_series = st.checkbox("Include Time Series Data", True)
-
-            try:
-                synthetic_df = generate_synthetic_data(num_units, has_time_series)
-                st.subheader("Generated Synthetic Data")
-                st.dataframe(synthetic_df.head())
-                
-                # Capture info output
-                buffer = StringIO()
-                synthetic_df.info(buf=buffer)
-                s = buffer.getvalue()
-                st.text("DataFrame Info:")
-                st.text(s)
-
-                try:
-                    validate_data(synthetic_df.copy())
-                    st.success("Data validation successful!")
-                    st.session_state['synthetic_df'] = synthetic_df.copy() # Store in session state
-                    st.session_state['has_time_series'] = has_time_series # Store this as well for page3
-                except (KeyError, ValueError, TypeError) as e:
-                    st.error(f"Data validation failed: {e}")
-                    if 'synthetic_df' in st.session_state:
-                        del st.session_state['synthetic_df'] # Clear invalid data
-                    if 'has_time_series' in st.session_state:
-                        del st.session_state['has_time_series']
-
-            except TypeError as e:
-                st.error(f"Error generating data: {e}")
-                if 'synthetic_df' in st.session_state:
-                    del st.session_state['synthetic_df']
-                if 'has_time_series' in st.session_state:
-                    del st.session_state['has_time_series']
-        ```
-
-    *   **`application_pages/page2.py`**
-        ```python
-        import streamlit as st
-        import pandas as pd
-        import numpy as np
-
-        def calculate_residual_risk(df, calculation_method):
-            """Calculates the residual risk rating based on the specified calculation method."""
-            if calculation_method not in ['Basic', 'Weighted']:
-                raise ValueError("Invalid calculation_method. Choose 'Basic' or 'Weighted'.")
-
-            # Map the four Inherent_Risk_Rating levels to numerical scores 1-4 for calculation
-            # And map Control_Effectiveness_Rating (which is 'Low', 'Medium', 'High' in synthetic data) to 1-3.
-            inherent_risk_score_map = {'Low': 1, 'Medium': 2, 'High': 3, 'Very High': 4}
-            control_effectiveness_score_map = {'Low': 1, 'Medium': 2, 'High': 3} # Assuming 'Low' means less effective, 'High' means more.
-
-            df_copy = df.copy() # Work on a copy to avoid SettingWithCopyWarning
-
-            # Validate and map Inherent Risk Ratings
-            df_copy['Inherent_Risk_Score'] = df_copy['Inherent_Risk_Rating'].map(inherent_risk_score_map)
-            if df_copy['Inherent_Risk_Score'].isnull().any():
-                invalid_ratings = df_copy[df_copy['Inherent_Risk_Score'].isnull()]['Inherent_Risk_Rating'].unique()
-                raise ValueError(f"Invalid Inherent_Risk_Rating values: {invalid_ratings}. Allowed values are: {list(inherent_risk_score_map.keys())}")
-
-            # Validate and map Control Effectiveness Ratings
-            df_copy['Control_Effectiveness_Score'] = df_copy['Control_Effectiveness_Rating'].map(control_effectiveness_score_map)
-            if df_copy['Control_Effectiveness_Score'].isnull().any():
-                invalid_ratings = df_copy[df_copy['Control_Effectiveness_Score'].isnull()]['Control_Effectiveness_Rating'].unique()
-                raise ValueError(f"Invalid Control_Effectiveness_Rating values: {invalid_ratings}. Allowed values are: {list(control_effectiveness_score_map.keys())}")
-
-
-            if calculation_method == 'Basic':
-                # Inherent_Risk_Score - Control_Effectiveness_Score
-                # Higher score = higher risk
-                df_copy['Residual_Risk_Score'] = df_copy['Inherent_Risk_Score'] - df_copy['Control_Effectiveness_Score']
-                # Map scores to ratings: Lower score means lower residual risk
-                def map_basic_residual(score):
-                    if score <= 0: # e.g., Low-Effective (1-3=-2), Medium-Effective (2-3=-1), High-High (3-3=0)
-                        return 'Low'
-                    elif score == 1: # e.g., Medium-Low (2-1=1), High-Medium (3-2=1)
-                        return 'Medium'
-                    else: # score >= 2 e.g., High-Low (3-1=2), Very High-Low (4-1=3), Very High-Medium (4-2=2)
-                        return 'High'
-                df_copy['Residual_Risk_Rating'] = df_copy['Residual_Risk_Score'].apply(map_basic_residual)
-
-            elif calculation_method == 'Weighted':
-                # Inherent_Risk_Score / Control_Effectiveness_Score
-                # Higher ratio = higher risk
-                df_copy['Residual_Risk_Score'] = df_copy['Inherent_Risk_Score'] / df_copy['Control_Effectiveness_Score']
-                # Map scores to ratings: Lower score means lower residual risk
-                def map_weighted_residual(score):
-                    if score <= 1.0: # e.g., 1/3, 1/2, 1/1, 2/2, 3/3
-                        return 'Low'
-                    elif score <= 2.0: # e.g., 2/1, 3/2, 4/2
-                        return 'Medium'
-                    else: # score > 2.0 e.g., 3/1, 4/1
-                        return 'High'
-                df_copy['Residual_Risk_Rating'] = df_copy['Residual_Risk_Score'].apply(map_weighted_residual)
-
-            return df_copy.drop(columns=['Inherent_Risk_Score', 'Control_Effectiveness_Score'])
-
-        def run_page2():
-            st.header("Residual Risk Calculation")
-
-            if 'synthetic_df' not in st.session_state:
-                st.warning("Please generate data on the 'Data Generation and Validation' page first.")
-                return
-
-            synthetic_df = st.session_state['synthetic_df']
-
-            calculation_method = st.radio("Select Residual Risk Calculation Method", ('Basic', 'Weighted'))
-
-            try:
-                synthetic_df_calculated = calculate_residual_risk(synthetic_df, calculation_method)
-                st.subheader(f"Data with Residual Risk ({calculation_method} Method)")
-                st.dataframe(synthetic_df_calculated.head())
-                # Store the calculated DataFrame for Page 3
-                st.session_state['synthetic_df'] = synthetic_df_calculated.copy() 
-            except ValueError as e:
-                st.error(f"Error calculating residual risk: {e}")
-                # If calculation fails, ensure page3 doesn't get invalid data
-                if 'synthetic_df' in st.session_state:
-                    del st.session_state['synthetic_df']
-        ```
-
-    *   **`application_pages/page3.py`**
-        ```python
-        import streamlit as st
-        import pandas as pd
-        import numpy as np
-        import altair as alt
-
-        def plot_relationship_scatter_altair(df):
-            """Generates an interactive scatter plot of Process Complexity vs Residual Risk using Altair."""
-            if df.empty:
-                st.warning("No data to plot for Process Complexity vs Residual Risk.")
-                return None
-
-            if 'Process_Complexity' not in df.columns or 'Residual_Risk_Rating' not in df.columns:
-                st.error("DataFrame must contain 'Process_Complexity' and 'Residual_Risk_Rating' columns for scatter plot.")
-                return None
-
-            risk_mapping = {'Low': 1, 'Medium': 2, 'High': 3}
-            df['Residual_Risk_Rating_Numerical'] = df['Residual_Risk_Rating'].map(risk_mapping)
-
-            if df['Residual_Risk_Rating_Numerical'].isnull().any():
-                st.error("Residual_Risk_Rating must be categorical with levels 'Low', 'Medium', or 'High'.")
-                return None
-
-            chart = alt.Chart(df).mark_circle(size=60).encode(
-                x=alt.X('Process_Complexity', axis=alt.Axis(title='Process Complexity')),
-                y=alt.Y('Residual_Risk_Rating_Numerical', axis=alt.Axis(title='Residual Risk Rating (Numerical)',
-                                                                     values=[1, 2, 3],
-                                                                     labelExpr="datum.value == 1 ? 'Low' : datum.value == 2 ? 'Medium' : 'High'")),
-                tooltip=[
-                    alt.Tooltip('Risk_Assessment_Unit_ID'),
-                    alt.Tooltip('Inherent_Risk_Rating'),
-                    alt.Tooltip('Control_Effectiveness_Rating'),
-                    alt.Tooltip('Residual_Risk_Rating'),
-                    alt.Tooltip('Process_Complexity')
-                ],
-                color=alt.Color('Residual_Risk_Rating', scale=alt.Scale(domain=['Low', 'Medium', 'High'], range=['#1f77b4', '#ff7f0e', '#d62728']), legend=alt.Legend(title="Residual Risk"))
-            ).properties(
-                title='Process Complexity vs Residual Risk Rating'
-            ).interactive()
-
-            return chart
-
-        def plot_trend_line_altair(df):
-            """Generates an interactive line chart showing the trend of average Residual Risk Rating over Assessment Cycles using Altair."""
-            if df.empty:
-                st.warning("No data to plot for Residual Risk Trend.")
-                return None
-
-            if 'Assessment_Cycle' not in df.columns or 'Residual_Risk_Rating' not in df.columns:
-                st.info("Time-series data (Assessment_Cycle) is required for the Trend Plot. Please enable 'Include Time Series Data'.")
-                return None
-
-            risk_mapping = {'Low': 1, 'Medium': 2, 'High': 3}
-            df['Residual_Risk_Rating_Numerical'] = df['Residual_Risk_Rating'].map(risk_mapping)
-
-            if df['Residual_Risk_Rating_Numerical'].isnull().any():
-                st.error("Residual_Risk_Rating must be categorical with levels 'Low', 'Medium', or 'High'.")
-                return None
-
-            # Calculate the average Residual Risk Rating for each Assessment Cycle
-            avg_risk = df.groupby('Assessment_Cycle')['Residual_Risk_Rating_Numerical'].mean().reset_index()
-
-            chart = alt.Chart(avg_risk).mark_line(point=True).encode(
-                x=alt.X('Assessment_Cycle:O', axis=alt.Axis(title='Assessment Cycle', format="d")), # :O for ordinal to show all years
-                y=alt.Y('Residual_Risk_Rating_Numerical', axis=alt.Axis(title='Average Residual Risk Rating (Numerical)',
-                                                                     values=[1, 2, 3],
-                                                                     labelExpr="datum.value == 1 ? 'Low' : datum.value == 2 ? 'Medium' : 'High'")),
-                tooltip=[alt.Tooltip('Assessment_Cycle', title='Cycle'), alt.Tooltip('Residual_Risk_Rating_Numerical', title='Avg Risk', format=".2f")]
-            ).properties(
-                title='Trend of Average Residual Risk Rating Over Assessment Cycles'
-            ).interactive()
-
-            return chart
-
-        def plot_residual_risk_heatmap_altair(df):
-            """Generates an interactive heatmap of Inherent Risk vs Control Effectiveness showing Residual Risk."""
-            if df.empty:
-                st.warning("No data to plot for Residual Risk Heatmap.")
-                return None
-
-            required_cols = ['Inherent_Risk_Rating', 'Control_Effectiveness_Rating', 'Residual_Risk_Rating']
-            for col in required_cols:
-                if col not in df.columns:
-                    st.error(f"Missing column: {col} for Residual Risk Heatmap.")
-                    return None
-
-            # Define the order for categorical axes for better readability
-            inherent_order = ['Low', 'Medium', 'High', 'Very High']
-            control_order = ['Low', 'Medium', 'High'] # Assuming 'Low' control effectiveness is bad, 'High' is good
-
-            # Create a numerical mapping for Residual_Risk_Rating for color encoding
-            residual_risk_numerical_map = {'Low': 1, 'Medium': 2, 'High': 3}
-            df['Residual_Risk_Rating_Numerical'] = df['Residual_Risk_Rating'].map(residual_risk_numerical_map)
-
-            # Aggregate data for the heatmap
-            heatmap_data = df.groupby(['Inherent_Risk_Rating', 'Control_Effectiveness_Rating']).agg(
-                unit_count=('Risk_Assessment_Unit_ID', 'count'),
-                avg_residual_score=('Residual_Risk_Rating_Numerical', 'mean')
-            ).reset_index()
-
-            # Define color scale for average residual risk (e.g., green for low, red for high)
-            color_scale = alt.Scale(domain=[1, 3], range='viridis', type='linear') # Viridis for sequential data
-
-            chart = alt.Chart(heatmap_data).mark_rect().encode(
-                x=alt.X('Inherent_Risk_Rating:O', sort=inherent_order, axis=alt.Axis(title='Inherent Risk Rating')),
-                y=alt.Y('Control_Effectiveness_Rating:O', sort=control_order, axis=alt.Axis(title='Control Effectiveness Rating')),
-                color=alt.Color('avg_residual_score:Q', scale=color_scale, legend=alt.Legend(title="Avg. Residual Risk Score")),
-                tooltip=[
-                    alt.Tooltip('Inherent_Risk_Rating'),
-                    alt.Tooltip('Control_Effectiveness_Rating'),
-                    alt.Tooltip('unit_count', title='Number of Units'),
-                    alt.Tooltip('avg_residual_score', title='Avg. Residual Score', format=".2f")
-                ]
-            ).properties(
-                title='Aggregated Residual Risk by Inherent Risk & Control Effectiveness'
-            )
-
-            # Add text labels for unit count
-            text = chart.mark_text().encode(
-                x=alt.X('Inherent_Risk_Rating:O', sort=inherent_order),
-                y=alt.Y('Control_Effectiveness_Rating:O', sort=control_order),
-                text=alt.Text('unit_count', format='.0f'),
-                color=alt.value('black') # Make text black for readability
-            )
-
-            return (chart + text).interactive()
-
-        def run_page3():
-            st.header("Visualizations")
-
-            if 'synthetic_df' not in st.session_state:
-                st.warning("Please generate and validate data on the 'Data Generation and Validation' page first.")
-                return
-
-            synthetic_df = st.session_state['synthetic_df']
-            
-            synthetic_df_calculated = synthetic_df.copy()
-            if 'Residual_Risk_Rating' not in synthetic_df_calculated.columns:
-                st.warning("Please calculate Residual Risk first on the 'Residual Risk Calculation' page.")
-                return
-            
-            has_time_series = st.session_state.get('has_time_series', False) # Use get to provide a default value
-
-            st.subheader("Process Complexity vs Residual Risk")
-            scatter_chart = plot_relationship_scatter_altair(synthetic_df_calculated)
-            if scatter_chart:
-                st.altair_chart(scatter_chart, use_container_width=True)
-
-            if has_time_series:
-                st.subheader("Trend of Average Residual Risk Rating")
-                trend_chart = plot_trend_line_altair(synthetic_df_calculated)
-                if trend_chart:
-                    st.altair_chart(trend_chart, use_container_width=True)
-
-            st.subheader("Aggregated Residual Risk Heatmap")
-            heatmap_chart = plot_residual_risk_heatmap_altair(synthetic_df_calculated)
-            if heatmap_chart:
-                st.altair_chart(heatmap_chart, use_container_width=True)
-        ```
-
-4.  **Install Python Libraries:**
-    Navigate to the root `qulab_app` directory in your terminal and install the required libraries using pip:
-
-    ```bash
-    pip install streamlit pandas numpy altair
-    ```
-
-<aside class="positive">
-It's recommended to use a Python virtual environment to manage dependencies for your projects. You can create one using `python -m venv venv` and activate it with `source venv/bin/activate` (Linux/macOS) or `.\venv\Scripts\activate` (Windows PowerShell) before installing libraries.
-</aside>
-
-## 3. Understanding the Main Application (`app.py`)
-Duration: 0:03:00
-
-The `app.py` file is the heart of the Streamlit application. It acts as the orchestrator, setting up the overall layout, displaying general information, and managing navigation between different functional pages.
-
-### Key Components:
-
-*   `st.set_page_config(page_title="QuLab", layout="wide")`: Configures the Streamlit page, setting the browser tab title to "QuLab" and using a wide layout for better visual space.
-*   `st.sidebar.image("...")` and `st.sidebar.divider()`: Customize the sidebar with a logo and a visual separator.
-*   `st.title("QuLab")` and `st.markdown(...)`: Display the main title and the introductory text with key concepts and formulae. Notice the use of Markdown for rich text formatting, including mathematical expressions enclosed in `$$...$$`.
-*   `st.sidebar.selectbox(label="Navigation", options=["...", "...", "..."])`: This is the core navigation mechanism. It creates a dropdown in the sidebar, allowing users to select which "page" or functional section of the application they want to view.
-*   **Conditional Page Loading:** Based on the user's `page` selection, `app.py` dynamically imports and calls the `run_pageX()` function from the respective file in the `application_pages` directory. This keeps the main `app.py` clean and separates concerns.
-
+**`app.py`**
 ```python
-# app.py snippet for navigation
-page = st.sidebar.selectbox(label="Navigation", options=["Data Generation and Validation", "Residual Risk Calculation", "Visualizations"])
+import streamlit as st
+
+st.set_page_config(page_title="QuLab", layout="wide")
+st.sidebar.image("https://www.quantuniversity.com/assets/img/logo5.jpg")
+st.sidebar.divider()
+st.title("QuLab")
+st.divider()
+st.markdown("""
+In this lab, we explore operational risk assessment using synthetic data. This application allows you to generate risk assessment data, validate it, calculate residual risk based on different methods, and visualize the results. The purpose is to create hands-on experience for managing operational risk, which is vital for maintaining financial stability, ensuring regulatory compliance, and enhancing overall organizational resilience.
+
+$\text{Synthetic Data} = \{ \text{randomly sampled attributes for each unit} \}$
+
+$\text{Data Validation} = \{ \text{Column Presence} \} \cap \{ \text{Data Type Correctness} \} \cap \{ \text{PK Uniqueness} \} \cap \{ \text{No Missing Values} \}$
+
+$\text{Residual Risk} = f(\text{Inherent Risk}, \text{Control Effectiveness})$
+""")
+
+page = st.sidebar.selectbox(label="Navigation", options=["Data Generation and Validation", "Risk Calculation", "Visualizations"])
+
 if page == "Data Generation and Validation":
     from application_pages.page1 import run_page1
     run_page1()
-elif page == "Residual Risk Calculation":
+elif page == "Risk Calculation":
     from application_pages.page2 import run_page2
     run_page2()
 elif page == "Visualizations":
     from application_pages.page3 import run_page3
-    run_page3()
+    run_page3() # Corrected: Added run_page3() call
 ```
-This pattern ensures that only the code for the currently selected page is executed, which helps in optimizing performance and managing the application's state.
 
-## 4. Data Generation and Validation (Page 1: `page1.py`)
-Duration: 0:07:00
-
-The first functional page of QuLab is dedicated to generating synthetic operational risk data and validating its structure and content. This page is crucial as it provides the foundation data for subsequent risk calculations and visualizations.
-
-### Functions Explained:
-
-1.  `generate_synthetic_data(num_units, has_time_series)`:
-    *   This function creates a `pandas.DataFrame` filled with mock operational risk data.
-    *   **`num_units`**: Controls the number of risk assessment units (rows) in the dataset.
-    *   **`has_time_series`**: A boolean flag to include an `Assessment_Cycle` column, which is essential for time-based visualizations later.
-    *   It generates random data for various columns like `Risk_Assessment_Unit_Type`, `Inherent_Risk_Rating`, `Control_Effectiveness_Rating`, `Process_Complexity`, and operational metrics.
-
-    ```python
-    # application_pages/page1.py snippet for data generation
-    def generate_synthetic_data(num_units, has_time_series):
-        risk_unit_types = ['Business Unit', 'Department', 'Team']
-        risk_ratings = ['Low', 'Medium', 'High', 'Very High']
-        control_types = ['Preventative', 'Detective', 'Corrective']
-
-        data = {
-            'Risk_Assessment_Unit_ID': range(1, num_units + 1),
-            'Risk_Assessment_Unit_Type': np.random.choice(risk_unit_types, num_units),
-            'Inherent_Risk_Rating': np.random.choice(risk_ratings, num_units),
-            'Control_Effectiveness_Rating': np.random.choice(risk_ratings, num_units),
-            # ... other columns ...
-        }
-        df = pd.DataFrame(data)
-        if has_time_series:
-            df['Assessment_Cycle'] = np.random.randint(2020, 2024, num_units)
-        return df
-    ```
-
-2.  `validate_data(df)`:
-    *   This function ensures the integrity and correctness of the generated (or any input) DataFrame.
-    *   It performs several checks:
-        *   **Missing Columns:** Verifies that all `expected_columns` are present.
-        *   **Duplicate Primary Key:** Checks for uniqueness of `Risk_Assessment_Unit_ID`.
-        *   **Missing Values:** Ensures there are no `NaN` values in the DataFrame.
-        *   **Data Types:** Validates that each column has the expected data type (e.g., numeric for IDs, string for ratings, boolean for status).
-    *   It raises `KeyError`, `ValueError`, or `TypeError` if any validation fails, providing specific error messages.
-
-    ```python
-    # application_pages/page1.py snippet for data validation
-    def validate_data(df):
-        expected_columns = ['Risk_Assessment_Unit_ID', 'Risk_Assessment_Unit_Type', 'Inherent_Risk_Rating',
-                            # ... more columns ...
-                            ]
-        for col in expected_columns:
-            if col not in df.columns:
-                raise KeyError(f"Missing column: {col}")
-        # ... other validation checks ...
-    ```
-
-### Streamlit UI (`run_page1`):
-
-*   `st.slider("Number of Risk Units", 10, 500, 100)`: Allows users to control the size of the generated dataset.
-*   `st.checkbox("Include Time Series Data", True)`: A toggle to decide whether to include the `Assessment_Cycle` column.
-*   `st.dataframe(synthetic_df.head())`: Displays the first few rows of the generated DataFrame.
-*   `st.text(str(synthetic_df.info()))`: Shows a summary of the DataFrame's structure, including column names, non-null counts, and data types, which is useful for debugging and understanding the data.
-*   **Error Handling:** A `try-except` block wraps the data generation and validation calls, catching potential errors and displaying them to the user using `st.error()`.
-*   **Session State:** Crucially, if validation is successful, the `synthetic_df` and `has_time_series` flag are stored in `st.session_state`. This allows the data to persist and be accessed by other pages (`page2.py` and `page3.py`) without regenerating it every time.
-
+**`application_pages/page1.py`**
 ```python
-# application_pages/page1.py snippet for run_page1
+import streamlit as st
+import pandas as pd
+import numpy as np
+
+def generate_synthetic_data(num_units, has_time_series):
+    """Generates a pandas.DataFrame with synthetic operational risk data."""
+    if not isinstance(has_time_series, bool):
+      raise TypeError("has_time_series must be a boolean")
+
+    risk_unit_types = ['Business Unit', 'Department', 'Team']
+    risk_ratings = ['Low', 'Medium', 'High', 'Very High']
+    control_types = ['Preventative', 'Detective', 'Corrective']
+
+    data = {
+        'Risk_Assessment_Unit_ID': range(1, num_units + 1),
+        'Risk_Assessment_Unit_Type': np.random.choice(risk_unit_types, num_units),
+        'Inherent_Risk_Rating': np.random.choice(risk_ratings, num_units),
+        'Control_Effectiveness_Rating': np.random.choice(risk_ratings, num_units),
+        'Control_Type': np.random.choice(control_types, num_units),
+        'Control_Key_Status': np.random.choice([True, False], num_units),
+        'Process_Complexity': np.random.randint(1, 11, num_units),
+        'Operational_Metric_1': np.random.normal(50, 10, num_units),
+        'Operational_Metric_2': np.random.normal(100, 20, num_units)
+    }
+    df = pd.DataFrame(data)
+
+    if has_time_series:
+        df['Assessment_Cycle'] = np.random.randint(2020, 2024, num_units)
+    return df
+
+def validate_data(df):
+    """Validates DataFrame for expected columns, data types, PK uniqueness, and missing values."""
+    expected_columns = ['Risk_Assessment_Unit_ID', 'Risk_Assessment_Unit_Type', 'Inherent_Risk_Rating',
+                        'Control_Effectiveness_Rating', 'Control_Type', 'Control_Key_Status',
+                        'Process_Complexity', 'Operational_Metric_1', 'Operational_Metric_2']
+
+    for col in expected_columns:
+        if col not in df.columns:
+            raise KeyError(f"Missing column: {col}")
+
+    if df['Risk_Assessment_Unit_ID'].duplicated().any():
+        raise ValueError("Duplicate Risk_Assessment_Unit_ID values found.")
+
+    if df.isnull().any().any():
+        raise ValueError("Missing values found in DataFrame.")
+
+    if not pd.api.types.is_numeric_dtype(df['Risk_Assessment_Unit_ID']):
+        raise TypeError("Risk_Assessment_Unit_ID should be numeric.")
+    if not pd.api.types.is_string_dtype(df['Risk_Assessment_Unit_Type']):
+        raise TypeError("Risk_Assessment_Unit_Type should be string.")
+    if not pd.api.types.is_string_dtype(df['Inherent_Risk_Rating']):
+        raise TypeError("Inherent_Risk_Rating should be string.")
+    if not pd.api.types.is_string_dtype(df['Control_Effectiveness_Rating']):
+        raise TypeError("Control_Effectiveness_Rating should be string.")
+    if not pd.api.types.is_string_dtype(df['Control_Type']):
+        raise TypeError("Control_Type should be string.")
+    if not pd.api.types.is_bool_dtype(df['Control_Key_Status']):
+        raise TypeError("Control_Key_Status should be boolean.")
+    if not pd.api.types.is_numeric_dtype(df['Process_Complexity']):
+        raise TypeError("Process_Complexity should be numeric.")
+    if not pd.api.types.is_numeric_dtype(df['Operational_Metric_1']):
+        raise TypeError("Operational_Metric_1 should be numeric.")
+    if not pd.api.types.is_numeric_dtype(df['Operational_Metric_2']):
+        raise TypeError("Operational_Metric_2 should be numeric.")
+
 def run_page1():
-    # ... UI elements ...
+    st.header("Data Generation and Validation")
+    st.markdown("""
+    Here, you can generate synthetic operational risk data and validate its integrity. Adjust the parameters to create different datasets and ensure data quality.
+
+    The synthetic data generation process is summarized by:
+    $$\text{Synthetic Data} = \{ \text{randomly sampled attributes for each unit} \}$$
+    where each attribute is independently generated based on predefined distributions or lists of possible values.
+
+    The validation process can be summarized as follows:
+    $$\text{Data Validation} = \{ \text{Column Presence} \} \cap \{ \text{Data Type Correctness} \} \cap \{ \text{PK Uniqueness} \} \cap \{ \text{No Missing Values} \}$$
+    """)
+
+    num_units = st.sidebar.slider("Number of Risk Units", min_value=10, max_value=100, value=50, help="Adjust the number of hypothetical risk assessment units to simulate.")
+    has_time_series = st.sidebar.checkbox("Include Time Series Data", value=True, help="Check to include 'Assessment_Cycle' data, enabling the trend plot.")
+
+    synthetic_df = generate_synthetic_data(num_units, has_time_series)
+
+    st.subheader("Generated Data")
+    st.dataframe(synthetic_df)
+
+    st.subheader("Data Validation")
     try:
-        synthetic_df = generate_synthetic_data(num_units, has_time_series)
-        # ... display data ...
-        try:
-            validate_data(synthetic_df.copy())
-            st.success("Data validation successful!")
-            st.session_state['synthetic_df'] = synthetic_df.copy() # Store for other pages
-            st.session_state['has_time_series'] = has_time_series
-        except (KeyError, ValueError, TypeError) as e:
-            st.error(f"Data validation failed: {e}")
-            # Clear session state if data is invalid
-            if 'synthetic_df' in st.session_state: del st.session_state['synthetic_df']
-    except TypeError as e:
-        st.error(f"Error generating data: {e}")
+        validate_data(synthetic_df)
+        st.success("Data validation successful!")
+        # Store the generated and validated dataframe in session state for other pages
+        st.session_state['synthetic_df'] = synthetic_df
+    except Exception as e:
+        st.error(f"Data validation failed: {e}")
+        # Clear the session state if validation fails, to prevent using invalid data
+        if 'synthetic_df' in st.session_state:
+            del st.session_state['synthetic_df']
+
+
+if __name__ == "__main__":
+    run_page1()
 ```
 
-<aside class="positive">
-Using `st.session_state` is a best practice in Streamlit for sharing data between different parts of your application or across re-runs. This avoids global variables and helps maintain reactivity.
-</aside>
-
-## 5. Residual Risk Calculation (Page 2: `page2.py`)
-Duration: 0:10:00
-
-This page is where the core operational risk calculation logic resides. It takes the generated data and computes the residual risk based on user-selected methodologies.
-
-### Function Explained:
-
-`calculate_residual_risk(df, calculation_method)`:
-*   This function performs the actual calculation of residual risk.
-*   **Input**: A DataFrame (`df`) containing `Inherent_Risk_Rating` and `Control_Effectiveness_Rating`, and `calculation_method` ('Basic' or 'Weighted').
-*   **Mapping to Numerical Scores**: Both inherent risk and control effectiveness ratings (which are categorical like 'Low', 'Medium', 'High') are first mapped to numerical scores.
-    *   `inherent_risk_score_map`: {'Low': 1, 'Medium': 2, 'High': 3, 'Very High': 4}
-    *   `control_effectiveness_score_map`: {'Low': 1, 'Medium': 2, 'High': 3}
-*   **Validation of Ratings**: It includes checks to ensure that the risk ratings in the input DataFrame conform to the expected categories before mapping.
-
-*   **Calculation Methods:**
-    *   **'Basic' Method**: Implements the additive (subtractive) formula:
-        $$ \text{Residual Risk Score} = \text{Inherent Risk Score} - \text{Control Effectiveness Score} $$
-        A lower score indicates lower residual risk. The numerical score is then mapped back to 'Low', 'Medium', or 'High' categorical ratings based on predefined thresholds.
-    *   **'Weighted' Method**: Implements the multiplicative (ratio-based) formula:
-        $$ \text{Residual Risk Score} = \frac{\text{Inherent Risk Score}}{\text{Control Effectiveness Score}} $$
-        A higher ratio indicates higher residual risk. This score is also mapped back to 'Low', 'Medium', or 'High' categories.
-
-*   **Output**: The function returns the DataFrame with two new columns: `Residual_Risk_Score` and `Residual_Risk_Rating`.
-
+**`application_pages/page2.py`**
 ```python
-# application_pages/page2.py snippet for calculation
-def calculate_residual_risk(df, calculation_method):
-    inherent_risk_score_map = {'Low': 1, 'Medium': 2, 'High': 3, 'Very High': 4}
-    control_effectiveness_score_map = {'Low': 1, 'Medium': 2, 'High': 3}
+import streamlit as st
+import pandas as pd
+import numpy as np
 
-    df_copy = df.copy()
-    df_copy['Inherent_Risk_Score'] = df_copy['Inherent_Risk_Rating'].map(inherent_risk_score_map)
-    df_copy['Control_Effectiveness_Score'] = df_copy['Control_Effectiveness_Rating'].map(control_effectiveness_score_map)
+def calculate_residual_risk(df, calculation_method):
+    """Calculates the residual risk rating based on the specified calculation method."""
+    if df.empty:
+        df['Residual_Risk_Score'] = []
+        df['Residual_Risk_Rating'] = []
+        return df
+
+    if calculation_method not in ['Basic', 'Weighted']:
+        raise ValueError("Invalid calculation_method. Choose 'Basic' or 'Weighted'.")
+
+    risk_ratings_to_numeric = {'Low': 1, 'Medium': 2, 'High': 3, 'Very High': 4}
+    control_ratings_to_score = {'Low': 3, 'Medium': 2, 'High': 1, 'Very High': 0.5}
+
+    df['Inherent_Risk_Numeric'] = df['Inherent_Risk_Rating'].map(risk_ratings_to_numeric)
+    if df['Inherent_Risk_Numeric'].isnull().any():
+        invalid_ir = df[df['Inherent_Risk_Numeric'].isnull()]['Inherent_Risk_Rating'].unique()
+        raise ValueError(f"Invalid Inherent_Risk_Rating value(s): {invalid_ir}. Allowed values are: Low, Medium, High, Very High")
+
+    df['Control_Effectiveness_Score'] = df['Control_Effectiveness_Rating'].map(control_ratings_to_score)
+    if df['Control_Effectiveness_Score'].isnull().any():
+        invalid_ce = df[df['Control_Effectiveness_Score'].isnull()]['Control_Effectiveness_Rating'].unique()
+        raise ValueError(f"Invalid Control_Effectiveness_Rating value(s): {invalid_ce}. Allowed values are: Low, Medium, High, Very High (interpreted as Effective to Ineffective)")
 
     if calculation_method == 'Basic':
-        df_copy['Residual_Risk_Score'] = df_copy['Inherent_Risk_Score'] - df_copy['Control_Effectiveness_Score']
-        def map_basic_residual(score):
-            if score <= 0: return 'Low'
-            elif score == 1: return 'Medium'
-            else: return 'High'
-        df_copy['Residual_Risk_Rating'] = df_copy['Residual_Risk_Score'].apply(map_basic_residual)
-
+        df['Residual_Risk_Score'] = df['Inherent_Risk_Numeric'] - df['Control_Effectiveness_Score']
     elif calculation_method == 'Weighted':
-        df_copy['Residual_Risk_Score'] = df_copy['Inherent_Risk_Score'] / df_copy['Control_Effectiveness_Score']
-        def map_weighted_residual(score):
-            if score <= 1.0: return 'Low'
-            elif score <= 2.0: return 'Medium'
-            else: return 'High'
-        df_copy['Residual_Risk_Rating'] = df_copy['Residual_Risk_Score'].apply(map_weighted_residual)
+        df['Residual_Risk_Score'] = df['Inherent_Risk_Numeric'] / df['Control_Effectiveness_Score'].replace(0, 0.001)
 
-    return df_copy.drop(columns=['Inherent_Risk_Score', 'Control_Effectiveness_Score'])
-```
+    min_score = df['Residual_Risk_Score'].min()
+    max_score = df['Residual_Risk_Score'].max()
+    score_range = max_score - min_score
 
-### Streamlit UI (`run_page2`):
+    if score_range > 0:
+        low_threshold = min_score + 0.33 * score_range
+        medium_threshold = min_score + 0.66 * score_range
+    else:
+        low_threshold = min_score
+        medium_threshold = min_score
 
-*   **Data Retrieval from Session State**: The first crucial step is to retrieve the `synthetic_df` from `st.session_state`. If the data isn't available (e.g., if the user navigated directly to this page or if data generation failed), a warning message is displayed.
-    ```python
+    def map_score_to_rating(score):
+        if score <= low_threshold:
+            return 'Low'
+        elif score <= medium_threshold:
+            return 'Medium'
+        else:
+            return 'High'
+
+    df['Residual_Risk_Rating'] = df['Residual_Risk_Score'].apply(map_score_to_rating)
+    df = df.drop(columns=['Inherent_Risk_Numeric', 'Control_Effectiveness_Score'])
+
+    return df
+
+def run_page2():
+    st.header("Risk Calculation")
+    st.markdown("""
+    Calculate the residual risk based on the inherent risk and control effectiveness. Choose the calculation method to see the impact on the residual risk scores and ratings.
+    The basic formula for residual risk calculation is:
+    $$\text{Residual Risk} = f(\text{Inherent Risk}, \text{Control Effectiveness})$$
+    where $f$ can be either an additive function (Basic method) or a multiplicative/weighted function (Weighted method). The choice of method should reflect the organization's specific approach to risk assessment and the relative importance of controls in mitigating inherent risks.
+    """)
+
+    calculation_method = st.sidebar.radio("Calculation Method", options=['Basic', 'Weighted'], help="Choose the formula for calculating Residual Risk: 'Basic' (Inherent - Control) or 'Weighted' (Inherent / Control).")
+
+    # Use a session state to store the dataframe from page 1
     if 'synthetic_df' not in st.session_state:
         st.warning("Please generate data on the 'Data Generation and Validation' page first.")
         return
-    synthetic_df = st.session_state['synthetic_df']
-    ```
-*   `st.radio("Select Residual Risk Calculation Method", ('Basic', 'Weighted'))`: Allows the user to choose between the two calculation methods.
-*   `st.dataframe(synthetic_df_calculated.head())`: Displays the first few rows of the DataFrame, now including the new residual risk columns.
-*   **Error Handling**: A `try-except` block handles `ValueError` from the `calculate_residual_risk` function, displaying an informative error message if invalid ratings are encountered.
-*   **Updating Session State**: After successful calculation, the *updated* `synthetic_df_calculated` (which now includes residual risk) is stored back into `st.session_state['synthetic_df']`. This ensures that the visualizations page (`page3.py`) gets the data with the calculated residual risk.
 
-<aside class="positive">
-Passing data between pages using `st.session_state` is more robust and efficient than re-running data generation or calculation logic on every page load.
-</aside>
+    synthetic_df = st.session_state['synthetic_df'].copy()
 
-## 6. Visualizing Operational Risk (Page 3: `page3.py`)
-Duration: 0:12:00
+    if synthetic_df is None or synthetic_df.empty:
+        st.warning("No data to calculate residual risk. Please generate data first.")
+        return
 
-The final page of QuLab leverages the powerful Altair library to create interactive visualizations that help in understanding the relationships and trends within the operational risk data.
+    try:
+        residual_risk_df = calculate_residual_risk(synthetic_df, calculation_method)
+        st.subheader("Residual Risk Results")
+        st.dataframe(residual_risk_df)
+        # Store the updated dataframe with residual risk in session state for other pages
+        st.session_state['synthetic_df'] = residual_risk_df
+    except Exception as e:
+        st.error(f"Risk calculation failed: {e}")
 
-### Key Visualization Functions:
+if __name__ == "__main__":
+    run_page2()
+```
 
-1.  `plot_relationship_scatter_altair(df)`:
-    *   **Purpose**: To visualize the relationship between `Process_Complexity` (a continuous numerical metric) and `Residual_Risk_Rating` (a categorical risk level).
-    *   **Altair Usage**: Uses `mark_circle()` for a scatter plot.
-    *   `x` and `y` encoding define the axes.
-    *   `tooltip` provides detailed information when hovering over points.
-    *   `color` encoding maps `Residual_Risk_Rating` to different colors, using a custom color scale for better differentiation.
-    *   `Residual_Risk_Rating` is mapped to a numerical value temporarily for plotting on a quantitative Y-axis, then custom `labelExpr` is used for axis labels.
+**`application_pages/page3.py`**
+```python
+import streamlit as st
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
 
-    ```python
-    # application_pages/page3.py snippet for scatter plot
-    def plot_relationship_scatter_altair(df):
-        risk_mapping = {'Low': 1, 'Medium': 2, 'High': 3}
-        df['Residual_Risk_Rating_Numerical'] = df['Residual_Risk_Rating'].map(risk_mapping)
-        chart = alt.Chart(df).mark_circle(size=60).encode(
-            x=alt.X('Process_Complexity', axis=alt.Axis(title='Process Complexity')),
-            y=alt.Y('Residual_Risk_Rating_Numerical', axis=alt.Axis(title='Residual Risk Rating (Numerical)',
-                                                                     values=[1, 2, 3],
-                                                                     labelExpr="datum.value == 1 ? 'Low' : datum.value == 2 ? 'Medium' : 'High'")),
-            color=alt.Color('Residual_Risk_Rating', scale=alt.Scale(domain=['Low', 'Medium', 'High'], range=['#1f77b4', '#ff7f0e', '#d62728'])),
-            tooltip=[alt.Tooltip('Risk_Assessment_Unit_ID'), # ... more tooltips ... ]
-        ).properties(title='Process Complexity vs Residual Risk Rating').interactive()
-        return chart
-    ```
+def plot_relationship_scatter(df):
+    """Generates a scatter plot of Process Complexity vs Residual Risk."""
+    if df.empty or 'Process_Complexity' not in df.columns or 'Residual_Risk_Rating' not in df.columns:
+        st.warning("Cannot generate scatter plot: missing required data or columns.")
+        return None
 
-2.  `plot_trend_line_altair(df)`:
-    *   **Purpose**: To show the trend of average residual risk over `Assessment_Cycle` (time). This plot only appears if "Include Time Series Data" was checked on Page 1.
-    *   **Altair Usage**: Uses `mark_line(point=True)` for a line chart with points.
-    *   It first calculates the mean `Residual_Risk_Rating_Numerical` for each `Assessment_Cycle`.
-    *   `x` encoding uses `Assessment_Cycle:O` (ordinal) to ensure all cycles are displayed, and `y` shows the average numerical risk.
+    risk_mapping = {'Low': 1, 'Medium': 2, 'High': 3, 'Very High': 4} # Include Very High
+    df_plot = df.copy()
+    df_plot['Residual_Risk_Rating_Numerical'] = df_plot['Residual_Risk_Rating'].map(risk_mapping)
 
-    ```python
-    # application_pages/page3.py snippet for trend plot
-    def plot_trend_line_altair(df):
-        if 'Assessment_Cycle' not in df.columns:
-            st.info("Time-series data (Assessment_Cycle) is required for the Trend Plot.")
-            return None
-        # ... mapping and aggregation ...
-        avg_risk = df.groupby('Assessment_Cycle')['Residual_Risk_Rating_Numerical'].mean().reset_index()
-        chart = alt.Chart(avg_risk).mark_line(point=True).encode(
-            x=alt.X('Assessment_Cycle:O', axis=alt.Axis(title='Assessment Cycle', format="d")),
-            y=alt.Y('Residual_Risk_Rating_Numerical', axis=alt.Axis(title='Average Residual Risk Rating (Numerical)',
-                                                                     values=[1, 2, 3],
-                                                                     labelExpr="datum.value == 1 ? 'Low' : datum.value == 2 ? 'Medium' : 'High'")),
-            tooltip=[alt.Tooltip('Assessment_Cycle'), alt.Tooltip('Residual_Risk_Rating_Numerical', format=".2f")]
-        ).properties(title='Trend of Average Residual Risk Rating Over Assessment Cycles').interactive()
-        return chart
-    ```
+    if df_plot['Residual_Risk_Rating_Numerical'].isnull().any():
+        st.warning("Skipping scatter plot: Residual_Risk_Rating contains values outside expected 'Low', 'Medium', 'High', 'Very High'.")
+        return None
 
-3.  `plot_residual_risk_heatmap_altair(df)`:
-    *   **Purpose**: To visualize the aggregated residual risk based on combinations of `Inherent_Risk_Rating` and `Control_Effectiveness_Rating`. This forms a matrix or heatmap.
-    *   **Altair Usage**: Uses `mark_rect()` for the heatmap cells and `mark_text()` for labels within cells.
-    *   It groups data by `Inherent_Risk_Rating` and `Control_Effectiveness_Rating` to calculate the `unit_count` and `avg_residual_score` for each combination.
-    *   `color` encoding maps the `avg_residual_score` to a color scale (e.g., 'viridis').
-    *   `text` encoding displays the `unit_count` directly on the heatmap cells.
+    fig, ax = plt.subplots(figsize=(8, 6))
+    ax.scatter(df_plot['Process_Complexity'], df_plot['Residual_Risk_Rating_Numerical'], alpha=0.7)
+    ax.set_title('Process Complexity vs Residual Risk Rating', fontsize=14)
+    ax.set_xlabel('Process Complexity', fontsize=12)
+    ax.set_ylabel('Residual Risk Rating (Numerical)', fontsize=12)
+    ax.set_yticks([1, 2, 3, 4]) # Include Very High
+    ax.set_yticklabels(['Low', 'Medium', 'High', 'Very High']) # Include Very High
+    ax.grid(True)
+    plt.tight_layout()
+    return fig
 
-    ```python
-    # application_pages/page3.py snippet for heatmap
-    def plot_residual_risk_heatmap_altair(df):
-        # ... mapping and aggregation ...
-        heatmap_data = df.groupby(['Inherent_Risk_Rating', 'Control_Effectiveness_Rating']).agg(
-            unit_count=('Risk_Assessment_Unit_ID', 'count'),
-            avg_residual_score=('Residual_Risk_Rating_Numerical', 'mean')
-        ).reset_index()
+def plot_trend_line(df):
+    """Generates a line chart showing the trend of average Residual Risk Rating over Assessment Cycles."""
+    if df.empty or 'Assessment_Cycle' not in df.columns or 'Residual_Risk_Rating' not in df.columns:
+        st.warning("Cannot generate trend plot: missing required data or 'Assessment_Cycle' column.")
+        return None
 
-        chart = alt.Chart(heatmap_data).mark_rect().encode(
-            x=alt.X('Inherent_Risk_Rating:O', sort=['Low', 'Medium', 'High', 'Very High'], axis=alt.Axis(title='Inherent Risk Rating')),
-            y=alt.Y('Control_Effectiveness_Rating:O', sort=['Low', 'Medium', 'High'], axis=alt.Axis(title='Control Effectiveness Rating')),
-            color=alt.Color('avg_residual_score:Q', scale=alt.Scale(domain=[1, 3], range='viridis', type='linear')),
-            tooltip=[alt.Tooltip('Inherent_Risk_Rating'), alt.Tooltip('Control_Effectiveness_Rating'),
-                     alt.Tooltip('unit_count'), alt.Tooltip('avg_residual_score', format=".2f")]
-        ).properties(title='Aggregated Residual Risk by Inherent Risk & Control Effectiveness')
+    risk_mapping = {'Low': 1, 'Medium': 2, 'High': 3, 'Very High': 4} # Include Very High
+    df_plot = df.copy()
+    df_plot['Residual_Risk_Rating_Numerical'] = df_plot['Residual_Risk_Rating'].map(risk_mapping)
 
-        text = chart.mark_text().encode(text=alt.Text('unit_count', format='.0f'), color=alt.value('black'))
-        return (chart + text).interactive()
-    ```
+    if df_plot['Residual_Risk_Rating_Numerical'].isnull().any():
+        st.warning("Skipping trend plot: Residual_Risk_Rating contains values outside expected 'Low', 'Medium', 'High', 'Very High'.")
+        return None
 
-### Streamlit UI (`run_page3`):
+    avg_risk = df_plot.groupby('Assessment_Cycle')['Residual_Risk_Rating_Numerical'].mean().reset_index()
 
-*   **Data Retrieval**: Similar to `page2.py`, it first retrieves the `synthetic_df` from `st.session_state`. It also checks if `Residual_Risk_Rating` has been calculated and if `has_time_series` was enabled.
-*   `st.altair_chart(chart, use_container_width=True)`: This Streamlit function is used to render the Altair charts in the application. `use_container_width=True` makes the charts responsive to the screen width.
-*   Conditional Plotting: The trend plot is only displayed if `has_time_series` is true, ensuring relevant visualizations are shown based on the data available.
+    fig, ax = plt.subplots(figsize=(10, 6))
+    ax.plot(avg_risk['Assessment_Cycle'], avg_risk['Residual_Risk_Rating_Numerical'], marker='o', linestyle='-', color='skyblue')
+    ax.set_title('Trend of Average Residual Risk Rating Over Assessment Cycles', fontsize=14)
+    ax.set_xlabel('Assessment Cycle', fontsize=12)
+    ax.set_ylabel('Average Residual Risk Rating', fontsize=12)
+    ax.grid(True, linestyle='--')
+    ax.set_xticks(avg_risk['Assessment_Cycle'])
+    ax.set_ylim(0.5, 4.5) # Update y axis limit
+    ax.set_yticks([1, 2, 3, 4]) # Update y axis ticks
+    ax.set_yticklabels(['Low', 'Medium', 'High', 'Very High']) # Update y axis ticklabels
+    plt.tight_layout()
+    return fig
 
-<aside class="positive">
-Altair charts are interactive by default (panning, zooming, tooltips), offering a rich exploratory data analysis experience.
-</aside>
+def plot_risk_heatmap(df):
+    """Generates a heatmap of Inherent Risk vs Control Effectiveness showing Residual Risk."""
+    if df.empty or 'Inherent_Risk_Rating' not in df.columns or 'Control_Effectiveness_Rating' not in df.columns or 'Residual_Risk_Rating' not in df.columns:
+        st.warning("Cannot generate heatmap: missing required data or columns.")
+        return None
 
-## 7. Running the Application
-Duration: 0:02:00
+    risk_rating_order = ['Low', 'Medium', 'High', 'Very High']
+    control_effectiveness_order = ['Low', 'Medium', 'High', 'Very High']
 
-Now that you have all the files set up and dependencies installed, you can run the Streamlit application.
+    risk_mapping_numerical = {'Low': 1, 'Medium': 2, 'High': 3, 'Very High': 4}
+    df_plot = df.copy()
+    df_plot['Residual_Risk_Rating_Numerical'] = df_plot['Residual_Risk_Rating'].map(risk_mapping_numerical)
 
-### Steps to Run:
+    if df_plot['Residual_Risk_Rating_Numerical'].isnull().any():
+        st.warning("Skipping heatmap: Residual_Risk_Rating contains values outside expected 'Low', 'Medium', 'High', 'Very High'.")
+        return None
 
-1.  **Open your terminal or command prompt.**
-2.  **Navigate to the `qulab_app` directory** (the one containing `app.py`).
+    heatmap_data = df_plot.groupby(['Inherent_Risk_Rating', 'Control_Effectiveness_Rating'])['Residual_Risk_Rating_Numerical'].mean().unstack()
+    heatmap_data = heatmap_data.reindex(index=[r for r in risk_rating_order if r in heatmap_data.index],
+                                        columns=[c for c in control_effectiveness_order if c in heatmap_data.columns])
 
-    ```bash
-    cd path/to/your/qulab_app
-    ```
-3.  **Run the Streamlit application** using the `streamlit run` command:
+    fig, ax = plt.subplots(figsize=(10, 8))
+    sns.heatmap(heatmap_data, annot=True, cmap='viridis_r', fmt=".1f", linewidths=.5, ax=ax,
+                cbar_kws={'label': 'Average Residual Risk (Numerical)'})
 
+    ax.set_title('Inherent Risk vs Control Effectiveness (Average Residual Risk)', fontsize=14)
+    ax.set_xlabel('Control Effectiveness Rating', fontsize=12)
+    ax.set_ylabel('Inherent Risk Rating', fontsize=12)
+    plt.tight_layout()
+    return fig
+
+def run_page3():
+    st.header("Visualizations")
+    st.markdown("""
+    Explore the relationships between different risk factors through interactive visualizations.
+    """)
+
+    if 'synthetic_df' not in st.session_state:
+        st.warning("Please generate data and calculate residual risk on the previous pages first.")
+        return
+
+    synthetic_df = st.session_state['synthetic_df'].copy()
+
+    if synthetic_df is None or synthetic_df.empty:
+        st.warning("No data to visualize. Please generate data and calculate residual risk first.")
+        return
+
+    st.subheader("Relationship Plot: Process Complexity vs Residual Risk")
+    relationship_fig = plot_relationship_scatter(synthetic_df)
+    if relationship_fig:
+        st.pyplot(relationship_fig)
+
+    if 'Assessment_Cycle' in synthetic_df.columns:
+        st.subheader("Trend Plot: Average Residual Risk Rating Over Assessment Cycles")
+        trend_fig = plot_trend_line(synthetic_df)
+        if trend_fig:
+            st.pyplot(trend_fig)
+
+    st.subheader("Aggregated Comparison: Heatmap")
+    heatmap_fig = plot_risk_heatmap(synthetic_df)
+    if heatmap_fig:
+        st.pyplot(heatmap_fig)
+
+if __name__ == "__main__":
+    run_page3()
+```
+*(Note: An `__init__.py` file (even empty) is required in the `application_pages` directory for Python to treat it as a package and allow imports like `from application_pages.page1 import run_page1`.)*
+
+### Running the Application
+
+1.  Open your terminal or command prompt.
+2.  Navigate to the `quLab_app` directory (where `app.py` is located).
+3.  Run the Streamlit application:
     ```bash
     streamlit run app.py
     ```
 
-### Interacting with the Application:
+This command will open a new tab in your web browser displaying the QuLab application.
 
-*   After running the command, your web browser will automatically open to `http://localhost:8501/` (or a similar address).
-*   **Start with "Data Generation and Validation"**: Use the slider to adjust the number of risk units and toggle the "Include Time Series Data" checkbox. Observe the generated data and the validation results.
-*   **Proceed to "Residual Risk Calculation"**: Select either "Basic" or "Weighted" methods and see how the `Residual_Risk_Rating` changes in the displayed DataFrame.
-*   **Explore "Visualizations"**: Interact with the scatter plot, trend line (if time-series data was included), and heatmap to gain insights into the relationships between different risk factors and their impact on residual risk.
+## Step 3: Data Generation and Validation
+Duration: 00:10:00
+
+The first core functionality of the QuLab application is generating synthetic operational risk data and validating its integrity. This is handled by `application_pages/page1.py`.
+
+### Synthetic Data Generation
+
+The `generate_synthetic_data` function creates a pandas DataFrame filled with various attributes relevant to operational risk assessment. These attributes are randomly sampled from predefined lists or distributions.
+
+**Key attributes generated:**
+
+-   `Risk_Assessment_Unit_ID`: Unique identifier for each unit.
+-   `Risk_Assessment_Unit_Type`: Categories like 'Business Unit', 'Department', 'Team'.
+-   `Inherent_Risk_Rating`: 'Low', 'Medium', 'High', 'Very High'.
+-   `Control_Effectiveness_Rating`: 'Low', 'Medium', 'High', 'Very High' (representing different levels of control strength).
+-   `Control_Type`: 'Preventative', 'Detective', 'Corrective'.
+-   `Control_Key_Status`: Boolean (True/False).
+-   `Process_Complexity`: Integer from 1 to 10.
+-   `Operational_Metric_1`, `Operational_Metric_2`: Normally distributed numerical metrics.
+-   `Assessment_Cycle` (Optional): An integer representing the year, included if `has_time_series` is True.
 
 <aside class="positive">
-Experiment with different input parameters on the "Data Generation and Validation" page to see how it affects the data and subsequent calculations and visualizations. This hands-on exploration will deepen your understanding of the concepts.
+  Using synthetic data is a great way to develop and test risk models without relying on sensitive real-world data, ensuring privacy and compliance during development.
 </aside>
+
+**Code Snippet (`generate_synthetic_data` function from `application_pages/page1.py`):**
+```python
+def generate_synthetic_data(num_units, has_time_series):
+    """Generates a pandas.DataFrame with synthetic operational risk data."""
+    if not isinstance(has_time_series, bool):
+      raise TypeError("has_time_series must be a boolean")
+
+    risk_unit_types = ['Business Unit', 'Department', 'Team']
+    risk_ratings = ['Low', 'Medium', 'High', 'Very High']
+    control_types = ['Preventative', 'Detective', 'Corrective']
+
+    data = {
+        'Risk_Assessment_Unit_ID': range(1, num_units + 1),
+        'Risk_Assessment_Unit_Type': np.random.choice(risk_unit_types, num_units),
+        'Inherent_Risk_Rating': np.random.choice(risk_ratings, num_units),
+        'Control_Effectiveness_Rating': np.random.choice(risk_ratings, num_units),
+        'Control_Type': np.random.choice(control_types, num_units),
+        'Control_Key_Status': np.random.choice([True, False], num_units),
+        'Process_Complexity': np.random.randint(1, 11, num_units),
+        'Operational_Metric_1': np.random.normal(50, 10, num_units),
+        'Operational_Metric_2': np.random.normal(100, 20, num_units)
+    }
+    df = pd.DataFrame(data)
+
+    if has_time_series:
+        df['Assessment_Cycle'] = np.random.randint(2020, 2024, num_units)
+    return df
+```
+
+### Data Validation
+
+The `validate_data` function ensures the quality and correctness of the generated DataFrame. It performs several checks:
+
+1.  **Column Presence**: Verifies that all expected columns exist.
+2.  **Primary Key Uniqueness**: Checks for duplicate `Risk_Assessment_Unit_ID` values.
+3.  **Missing Values**: Ensures there are no null values in the DataFrame.
+4.  **Data Type Correctness**: Confirms that each column has the expected data type (e.g., numeric for IDs, string for ratings, boolean for status).
+
+**Code Snippet (`validate_data` function from `application_pages/page1.py`):**
+```python
+def validate_data(df):
+    """Validates DataFrame for expected columns, data types, PK uniqueness, and missing values."""
+    expected_columns = ['Risk_Assessment_Unit_ID', 'Risk_Assessment_Unit_Type', 'Inherent_Risk_Rating',
+                        'Control_Effectiveness_Rating', 'Control_Type', 'Control_Key_Status',
+                        'Process_Complexity', 'Operational_Metric_1', 'Operational_Metric_2']
+
+    for col in expected_columns:
+        if col not in df.columns:
+            raise KeyError(f"Missing column: {col}")
+
+    if df['Risk_Assessment_Unit_ID'].duplicated().any():
+        raise ValueError("Duplicate Risk_Assessment_Unit_ID values found.")
+
+    if df.isnull().any().any():
+        raise ValueError("Missing values found in DataFrame.")
+
+    if not pd.api.types.is_numeric_dtype(df['Risk_Assessment_Unit_ID']):
+        raise TypeError("Risk_Assessment_Unit_ID should be numeric.")
+    if not pd.api.types.is_string_dtype(df['Risk_Assessment_Unit_Type']):
+        raise TypeError("Risk_Assessment_Unit_Type should be string.")
+    if not pd.api.types.is_string_dtype(df['Inherent_Risk_Rating']):
+        raise TypeError("Inherent_Risk_Rating should be string.")
+    if not pd.api.types.is_string_dtype(df['Control_Effectiveness_Rating']):
+        raise TypeError("Control_Effectiveness_Rating should be string.")
+    if not pd.api.types.is_string_dtype(df['Control_Type']):
+        raise TypeError("Control_Type should be string.")
+    if not pd.api.types.is_bool_dtype(df['Control_Key_Status']):
+        raise TypeError("Control_Key_Status should be boolean.")
+    if not pd.api.types.is_numeric_dtype(df['Process_Complexity']):
+        raise TypeError("Process_Complexity should be numeric.")
+    if not pd.api.types.is_numeric_dtype(df['Operational_Metric_1']):
+        raise TypeError("Operational_Metric_1 should be numeric.")
+    if not pd.api.types.is_numeric_dtype(df['Operational_Metric_2']):
+        raise TypeError("Operational_Metric_2 should be numeric.")
+```
+
+### Streamlit Interface
+
+On the "Data Generation and Validation" page in the Streamlit app:
+-   You will find a slider in the sidebar to control the **"Number of Risk Units"** (from 10 to 100).
+-   A checkbox allows you to **"Include Time Series Data"**, which adds the `Assessment_Cycle` column, crucial for trend analysis in visualizations.
+-   The generated data is displayed in a `st.dataframe` widget.
+-   After generation, the `validate_data` function is called, and a success or error message is shown based on the validation outcome.
+-   Crucially, the validated DataFrame is stored in Streamlit's `st.session_state` as `'synthetic_df'`. This allows the data to persist and be accessed by other pages (`page2` and `page3`) without re-generation. If validation fails, the `session_state` is cleared to prevent downstream issues.
+
+<aside class="negative">
+  If data validation fails, the application will display an error, and subsequent pages that rely on this data (Risk Calculation, Visualizations) will not function correctly until valid data is generated. Always ensure data quality!
+</aside>
+
+Experiment with different settings and observe the generated data and validation results.
+
+## Step 4: Residual Risk Calculation
+Duration: 00:15:00
+
+Once the synthetic data is generated and validated, the next step is to calculate the residual risk. This process is handled by `application_pages/page2.py`. Residual risk represents the level of risk remaining after considering the effectiveness of existing controls.
+
+### The `calculate_residual_risk` Function
+
+This function takes the DataFrame and a `calculation_method` as input and computes a `Residual_Risk_Score` and `Residual_Risk_Rating` for each risk unit.
+
+1.  **Mapping Ratings to Numeric Scores**:
+    -   `Inherent_Risk_Rating` (Low, Medium, High, Very High) are mapped to numerical values (1, 2, 3, 4 respectively).
+    -   `Control_Effectiveness_Rating` (Low, Medium, High, Very High) are mapped to scores (3, 2, 1, 0.5 respectively). Note that 'Low' control effectiveness leads to a higher control score (meaning controls are weak, hence more risk), and 'Very High' control effectiveness leads to a lower score (meaning controls are very strong, mitigating risk significantly).
+
+2.  **Residual Risk Calculation Methods**:
+    The application provides two common methods:
+
+    -   **Basic Method**: This is an additive or subtractive model.
+        $$\text{Residual Risk Score} = \text{Inherent Risk Numeric} - \text{Control Effectiveness Score}$$
+        A higher inherent risk score and a lower control effectiveness score (meaning controls are less effective) will result in a higher residual risk score.
+
+    -   **Weighted Method**: This is a multiplicative or ratio-based model.
+        $$\text{Residual Risk Score} = \frac{\text{Inherent Risk Numeric}}{\text{Control Effectiveness Score}}$$
+        For this method, `Control_Effectiveness_Score` is replaced with `0.001` if it is zero to avoid division by zero errors. This method implies that control effectiveness proportionally reduces inherent risk.
+
+3.  **Mapping Score to Rating**:
+    The calculated `Residual_Risk_Score` is then mapped back to categorical ratings ('Low', 'Medium', 'High'). This mapping is dynamic, based on the range of scores in the current dataset:
+    -   Scores are divided into three equal bins based on the `min_score` and `max_score` observed:
+        -   Scores $\le \text{min\_score} + 0.33 \times \text{score\_range}$ are mapped to 'Low'.
+        -   Scores $\le \text{min\_score} + 0.66 \times \text{score\_range}$ are mapped to 'Medium'.
+        -   All other scores are mapped to 'High'.
+
+**Code Snippet (`calculate_residual_risk` function from `application_pages/page2.py`):**
+```python
+def calculate_residual_risk(df, calculation_method):
+    """Calculates the residual risk rating based on the specified calculation method."""
+    if df.empty:
+        df['Residual_Risk_Score'] = []
+        df['Residual_Risk_Rating'] = []
+        return df
+
+    if calculation_method not in ['Basic', 'Weighted']:
+        raise ValueError("Invalid calculation_method. Choose 'Basic' or 'Weighted'.")
+
+    risk_ratings_to_numeric = {'Low': 1, 'Medium': 2, 'High': 3, 'Very High': 4}
+    control_ratings_to_score = {'Low': 3, 'Medium': 2, 'High': 1, 'Very High': 0.5}
+
+    df['Inherent_Risk_Numeric'] = df['Inherent_Risk_Rating'].map(risk_ratings_to_numeric)
+    if df['Inherent_Risk_Numeric'].isnull().any():
+        invalid_ir = df[df['Inherent_Risk_Numeric'].isnull()]['Inherent_Risk_Rating'].unique()
+        raise ValueError(f"Invalid Inherent_Risk_Rating value(s): {invalid_ir}. Allowed values are: Low, Medium, High, Very High")
+
+    df['Control_Effectiveness_Score'] = df['Control_Effectiveness_Rating'].map(control_ratings_to_score)
+    if df['Control_Effectiveness_Score'].isnull().any():
+        invalid_ce = df[df['Control_Effectiveness_Score'].isnull()]['Control_Effectiveness_Rating'].unique()
+        raise ValueError(f"Invalid Control_Effectiveness_Rating value(s): {invalid_ce}. Allowed values are: Low, Medium, High, Very High (interpreted as Effective to Ineffective)")
+
+    if calculation_method == 'Basic':
+        df['Residual_Risk_Score'] = df['Inherent_Risk_Numeric'] - df['Control_Effectiveness_Score']
+    elif calculation_method == 'Weighted':
+        df['Residual_Risk_Score'] = df['Inherent_Risk_Numeric'] / df['Control_Effectiveness_Score'].replace(0, 0.001)
+
+    min_score = df['Residual_Risk_Score'].min()
+    max_score = df['Residual_Risk_Score'].max()
+    score_range = max_score - min_score
+
+    if score_range > 0:
+        low_threshold = min_score + 0.33 * score_range
+        medium_threshold = min_score + 0.66 * score_range
+    else:
+        low_threshold = min_score
+        medium_threshold = min_score
+
+    def map_score_to_rating(score):
+        if score <= low_threshold:
+            return 'Low'
+        elif score <= medium_threshold:
+            return 'Medium'
+        else:
+            return 'High'
+
+    df['Residual_Risk_Rating'] = df['Residual_Risk_Score'].apply(map_score_to_rating)
+    df = df.drop(columns=['Inherent_Risk_Numeric', 'Control_Effectiveness_Score'])
+
+    return df
+```
+
+### Streamlit Interface
+
+On the "Risk Calculation" page in the Streamlit app:
+-   A radio button in the sidebar allows you to select the **"Calculation Method"** (Basic or Weighted).
+-   The page retrieves the `synthetic_df` from `st.session_state` (which was populated and validated on Page 1).
+-   The `calculate_residual_risk` function is called, and the resulting DataFrame, now including `Residual_Risk_Score` and `Residual_Risk_Rating` columns, is displayed.
+-   The updated DataFrame is then stored back into `st.session_state` to make it available for the visualization page.
+
+<aside class="positive">
+  Experiment with both 'Basic' and 'Weighted' calculation methods to observe how different approaches to combining inherent risk and control effectiveness can impact the final residual risk ratings. This highlights the importance of choosing an appropriate risk model.
+</aside>
+
+## Step 5: Visualizing Operational Risk
+Duration: 00:15:00
+
+Visualizations are essential for understanding complex data, identifying trends, and communicating insights. The `application_pages/page3.py` module provides several plots to help analyze the operational risk data.
+
+### Plotting Functions
+
+The page implements three distinct visualizations using `matplotlib` and `seaborn`:
+
+1.  **Relationship Plot: Process Complexity vs Residual Risk (Scatter Plot)**
+    -   **Function**: `plot_relationship_scatter(df)`
+    -   **Purpose**: To visualize if there's any correlation or pattern between the complexity of a process and its resulting residual risk. More complex processes might intuitively lead to higher residual risk.
+    -   This plot maps `Residual_Risk_Rating` to numerical values for plotting purposes.
+
+2.  **Trend Plot: Average Residual Risk Rating Over Assessment Cycles (Line Plot)**
+    -   **Function**: `plot_trend_line(df)`
+    -   **Purpose**: If 'Assessment_Cycle' data is included (from Page 1), this plot shows how the average residual risk has evolved over different assessment periods. This is critical for identifying improvements or deteriorations in overall risk posture over time.
+    -   It aggregates the average numerical residual risk rating per `Assessment_Cycle`.
+
+3.  **Aggregated Comparison: Heatmap of Inherent Risk vs Control Effectiveness**
+    -   **Function**: `plot_risk_heatmap(df)`
+    -   **Purpose**: This heatmap provides an aggregated view of average residual risk based on combinations of `Inherent_Risk_Rating` and `Control_Effectiveness_Rating`. It's an excellent way to see which combinations typically result in higher or lower residual risk. For example, high inherent risk with low control effectiveness should clearly show high residual risk.
+
+**Code Snippets (functions from `application_pages/page3.py`):**
+
+**`plot_relationship_scatter`**
+```python
+def plot_relationship_scatter(df):
+    """Generates a scatter plot of Process Complexity vs Residual Risk."""
+    if df.empty or 'Process_Complexity' not in df.columns or 'Residual_Risk_Rating' not in df.columns:
+        st.warning("Cannot generate scatter plot: missing required data or columns.")
+        return None
+
+    risk_mapping = {'Low': 1, 'Medium': 2, 'High': 3, 'Very High': 4}
+    df_plot = df.copy()
+    df_plot['Residual_Risk_Rating_Numerical'] = df_plot['Residual_Risk_Rating'].map(risk_mapping)
+
+    if df_plot['Residual_Risk_Rating_Numerical'].isnull().any():
+        st.warning("Skipping scatter plot: Residual_Risk_Rating contains values outside expected 'Low', 'Medium', 'High', 'Very High'.")
+        return None
+
+    fig, ax = plt.subplots(figsize=(8, 6))
+    ax.scatter(df_plot['Process_Complexity'], df_plot['Residual_Risk_Rating_Numerical'], alpha=0.7)
+    ax.set_title('Process Complexity vs Residual Risk Rating', fontsize=14)
+    ax.set_xlabel('Process Complexity', fontsize=12)
+    ax.set_ylabel('Residual Risk Rating (Numerical)', fontsize=12)
+    ax.set_yticks([1, 2, 3, 4])
+    ax.set_yticklabels(['Low', 'Medium', 'High', 'Very High'])
+    ax.grid(True)
+    plt.tight_layout()
+    return fig
+```
+
+**`plot_trend_line`**
+```python
+def plot_trend_line(df):
+    """Generates a line chart showing the trend of average Residual Risk Rating over Assessment Cycles."""
+    if df.empty or 'Assessment_Cycle' not in df.columns or 'Residual_Risk_Rating' not in df.columns:
+        st.warning("Cannot generate trend plot: missing required data or 'Assessment_Cycle' column.")
+        return None
+
+    risk_mapping = {'Low': 1, 'Medium': 2, 'High': 3, 'Very High': 4}
+    df_plot = df.copy()
+    df_plot['Residual_Risk_Rating_Numerical'] = df_plot['Residual_Risk_Rating'].map(risk_mapping)
+
+    if df_plot['Residual_Risk_Rating_Numerical'].isnull().any():
+        st.warning("Skipping trend plot: Residual_Risk_Rating contains values outside expected 'Low', 'Medium', 'High', 'Very High'.")
+        return None
+
+    avg_risk = df_plot.groupby('Assessment_Cycle')['Residual_Risk_Rating_Numerical'].mean().reset_index()
+
+    fig, ax = plt.subplots(figsize=(10, 6))
+    ax.plot(avg_risk['Assessment_Cycle'], avg_risk['Residual_Risk_Rating_Numerical'], marker='o', linestyle='-', color='skyblue')
+    ax.set_title('Trend of Average Residual Risk Rating Over Assessment Cycles', fontsize=14)
+    ax.set_xlabel('Assessment Cycle', fontsize=12)
+    ax.set_ylabel('Average Residual Risk Rating', fontsize=12)
+    ax.grid(True, linestyle='--')
+    ax.set_xticks(avg_risk['Assessment_Cycle'])
+    ax.set_ylim(0.5, 4.5)
+    ax.set_yticks([1, 2, 3, 4])
+    ax.set_yticklabels(['Low', 'Medium', 'High', 'Very High'])
+    plt.tight_layout()
+    return fig
+```
+
+**`plot_risk_heatmap`**
+```python
+def plot_risk_heatmap(df):
+    """Generates a heatmap of Inherent Risk vs Control Effectiveness showing Residual Risk."""
+    if df.empty or 'Inherent_Risk_Rating' not in df.columns or 'Control_Effectiveness_Rating' not in df.columns or 'Residual_Risk_Rating' not in df.columns:
+        st.warning("Cannot generate heatmap: missing required data or columns.")
+        return None
+
+    risk_rating_order = ['Low', 'Medium', 'High', 'Very High']
+    control_effectiveness_order = ['Low', 'Medium', 'High', 'Very High']
+
+    risk_mapping_numerical = {'Low': 1, 'Medium': 2, 'High': 3, 'Very High': 4}
+    df_plot = df.copy()
+    df_plot['Residual_Risk_Rating_Numerical'] = df_plot['Residual_Risk_Rating'].map(risk_mapping_numerical)
+
+    if df_plot['Residual_Risk_Rating_Numerical'].isnull().any():
+        st.warning("Skipping heatmap: Residual_Risk_Rating contains values outside expected 'Low', 'Medium', 'High', 'Very High'.")
+        return None
+
+    heatmap_data = df_plot.groupby(['Inherent_Risk_Rating', 'Control_Effectiveness_Rating'])['Residual_Risk_Rating_Numerical'].mean().unstack()
+    heatmap_data = heatmap_data.reindex(index=[r for r in risk_rating_order if r in heatmap_data.index],
+                                        columns=[c for c in control_effectiveness_order if c in heatmap_data.columns])
+
+    fig, ax = plt.subplots(figsize=(10, 8))
+    sns.heatmap(heatmap_data, annot=True, cmap='viridis_r', fmt=".1f", linewidths=.5, ax=ax,
+                cbar_kws={'label': 'Average Residual Risk (Numerical)'})
+
+    ax.set_title('Inherent Risk vs Control Effectiveness (Average Residual Risk)', fontsize=14)
+    ax.set_xlabel('Control Effectiveness Rating', fontsize=12)
+    ax.set_ylabel('Inherent Risk Rating', fontsize=12)
+    plt.tight_layout()
+    return fig
+```
+
+### Streamlit Interface
+
+On the "Visualizations" page in the Streamlit app:
+-   The page retrieves the processed `synthetic_df` from `st.session_state` (which now includes `Residual_Risk_Score` and `Residual_Risk_Rating`).
+-   Each plotting function is called, and if a figure is returned (meaning data requirements are met), it is displayed using `st.pyplot()`.
+-   The trend plot (`plot_trend_line`) will only appear if you selected "Include Time Series Data" on the "Data Generation and Validation" page.
+
+<aside class="positive">
+  Visualizations make it easy to spot trends, anomalies, and areas of high risk at a glance. For instance, the heatmap immediately highlights which combinations of inherent risk and control effectiveness lead to the highest average residual risk.
+</aside>
+
+Explore the visualizations and how they change as you adjust parameters on the previous pages (e.g., number of units, inclusion of time series data, or the residual risk calculation method).
+
+## Step 6: Extending and Customizing the Application
+Duration: 00:10:00
+
+The QuLab application provides a solid foundation for operational risk assessment. Here are some ideas for how you can extend and customize it further:
+
+1.  **More Sophisticated Data Generation**:
+    -   Implement correlations between attributes in `generate_synthetic_data` (e.g., higher process complexity leading to higher inherent risk).
+    -   Add more nuanced distributions for numerical metrics (e.g., skewed distributions).
+    -   Allow users to upload their own data instead of relying solely on synthetic data.
+
+2.  **Advanced Data Validation**:
+    -   Add rules for valid ranges for numerical columns.
+    -   Implement cross-column validation (e.g., `Control_Type` must be 'Preventative' if `Control_Key_Status` is True).
+    -   Integrate a data quality framework or a more robust schema validation library.
+
+3.  **New Risk Calculation Methods**:
+    -   Introduce new formulas for residual risk, perhaps based on industry-specific standards (e.g., Basel II/III operational risk approaches).
+    -   Incorporate qualitative factors or expert judgment into the risk score.
+    -   Model operational loss events and integrate them into the risk assessment.
+
+4.  **Interactive Visualizations**:
+    -   Replace `matplotlib` plots with interactive libraries like `Plotly`, `Altair`, or `Bokeh` for dynamic filtering and zooming.
+    -   Create interactive dashboards that allow users to slice and dice the data based on various risk attributes.
+    -   Implement a risk matrix visualization (e.g., a 5x5 matrix for likelihood vs. impact).
+
+5.  **Database Integration**:
+    -   Instead of `st.session_state`, connect the application to a real database (e.g., SQLite, PostgreSQL) to store and retrieve data persistently. This would allow for historical analysis and multi-user scenarios.
+
+6.  **User Authentication and Authorization**:
+    -   Add a login system to restrict access to certain functionalities or data.
+
+7.  **Machine Learning for Risk Prediction**:
+    -   Train a machine learning model (e.g., a classifier) to predict `Residual_Risk_Rating` based on other attributes, or to identify high-risk units.
+
+### Example: Adding a New Control Rating Category
+
+Let's say you want to add a 'Critical' control effectiveness rating.
+
+**Modify `application_pages/page1.py`:**
+In `generate_synthetic_data`, update `control_types`:
+```python
+    # ... existing code ...
+    risk_ratings = ['Low', 'Medium', 'High', 'Very High']
+    control_types = ['Preventative', 'Detective', 'Corrective'] # No change needed here for new rating
+    
+    # ... in data dictionary for 'Control_Effectiveness_Rating'
+    # This actually uses risk_ratings for control effectiveness, so update risk_ratings instead
+    risk_ratings = ['Low', 'Medium', 'High', 'Very High', 'Critical'] # Add 'Critical'
+    # ... and adjust probabilities if desired
+    data = {
+        # ...
+        'Inherent_Risk_Rating': np.random.choice(risk_ratings, num_units),
+        'Control_Effectiveness_Rating': np.random.choice(risk_ratings, num_units), # This uses the same list
+        # ...
+    }
+```
+In `validate_data`, ensure it can handle the new string:
+```python
+    # No direct change needed if it's still a string, but consider adding validation for allowed values.
+    # The error handling in calculate_residual_risk already catches invalid values.
+```
+
+**Modify `application_pages/page2.py`:**
+In `calculate_residual_risk`, update `risk_ratings_to_numeric` and `control_ratings_to_score` mappings:
+```python
+    risk_ratings_to_numeric = {'Low': 1, 'Medium': 2, 'High': 3, 'Very High': 4, 'Critical': 5} # Add 'Critical'
+    control_ratings_to_score = {'Low': 3, 'Medium': 2, 'High': 1, 'Very High': 0.5, 'Critical': 0.1} # Add 'Critical' with a very low score for very effective control
+```
+You might also need to adjust the `map_score_to_rating` function or thresholds if the new rating significantly changes the score range. Also, update `risk_rating_order` and `control_effectiveness_order` in `page3.py` for correct heatmap display.
+
+<aside class="positive">
+  Don't be afraid to experiment! The modular design of this Streamlit application makes it easy to add new features or modify existing ones without disrupting the entire codebase. Start with small, isolated changes and test frequently.
+</aside>
+
+This concludes the QuLab Operational Risk Assessment Codelab. We hope this comprehensive guide helps you understand the application's functionalities and inspires you to build upon it!
